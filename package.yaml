@@ -25,7 +25,7 @@ dependencies:
   - containers
 
 library:
-  source-dirs: src
+  source-dirs: haskellbook
 
 executables:
   learn-haskell-exe:

@@ -27,7 +27,7 @@ library
   other-modules:
       Paths_learn_haskell
   hs-source-dirs:
-      src
+      haskellbook
   build-depends:
       base >=4.7 && <5
     , containers
