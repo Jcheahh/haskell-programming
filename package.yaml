@@ -8,7 +8,6 @@ copyright: "2021 Author name here"
 
 extra-source-files:
   - README.md
-  - ChangeLog.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -23,28 +22,29 @@ dependencies:
   - base >= 4.7 && < 5
   - time
   - containers
+  - QuickCheck
+  - hspec
 
 library:
   source-dirs: haskellbook
+# executables:
+#   learn-haskell-exe:
+#     main: Main.hs
+#     source-dirs: app
+#     ghc-options:
+#       - -threaded
+#       - -rtsopts
+#       - -with-rtsopts=-N
+#     dependencies:
+#       - learn-haskell
 
-executables:
-  learn-haskell-exe:
-    main: Main.hs
-    source-dirs: app
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-    dependencies:
-      - learn-haskell
-
-tests:
-  learn-haskell-test:
-    main: Spec.hs
-    source-dirs: test
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-    dependencies:
-      - learn-haskell
+# tests:
+#   learn-haskell-test:
+#     main: Spec.hs
+#     source-dirs: test
+#     ghc-options:
+#       - -threaded
+#       - -rtsopts
+#       - -with-rtsopts=-N
+#     dependencies:
+#       - learn-haskell
