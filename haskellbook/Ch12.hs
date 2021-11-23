@@ -1,3 +1,5 @@
+module Ch12 where
+
 import Data.Maybe
 
 -- 12.5

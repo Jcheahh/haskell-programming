@@ -1,5 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
+module Ch14 where
+
 import Ch11 (capitalizeWord)
 import Ch8
   ( digitToWord,

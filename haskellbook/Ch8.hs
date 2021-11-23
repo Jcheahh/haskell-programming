@@ -1,3 +1,5 @@
+module Ch8 where
+
 import Data.Char
 import Data.List (intersperse)
 
@@ -77,7 +79,7 @@ digitToWord n
   | n == 6 = "six"
   | n == 7 = "seven"
   | n == 8 = "eight"
-  | n == 9 = "night"
+  | n == 9 = "nine"
   | otherwise = error "cant found"
 
 digits :: Int -> [Int]

@@ -1,3 +1,5 @@
+module Ch10 where
+
 import Data.Time
 import GHC.Base (liftA3)
 

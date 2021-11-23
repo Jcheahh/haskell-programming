@@ -24,8 +24,19 @@ source-repository head
 
 library
   exposed-modules:
+      Ch10
       Ch11
+      Ch12
+      Ch13
+      Ch14
+      Ch2
+      Ch3
+      Ch4
+      Ch5
+      Ch6
+      Ch7
       Ch8
+      Ch9
   other-modules:
       Paths_learn_haskell
   hs-source-dirs:

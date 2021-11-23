@@ -1,3 +1,5 @@
+module Ch3 where
+
 main :: IO ()
 main = putStrLn "hello world!"
 

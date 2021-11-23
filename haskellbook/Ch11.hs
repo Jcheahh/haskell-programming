@@ -1,5 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 
+module Ch11 where
+
 import Data.Char
 import Data.List
 import qualified Data.Map as Map

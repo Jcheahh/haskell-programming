@@ -1,3 +1,5 @@
+module Ch7 where
+
 mTh x y z = x * y * z
 
 {-

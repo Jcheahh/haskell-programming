@@ -1,3 +1,5 @@
+module Ch6 where
+
 import Data.List
 
 f1' :: RealFrac a => a
