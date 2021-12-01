@@ -24,6 +24,7 @@ dependencies:
   - containers
   - QuickCheck
   - hspec
+  - checkers
 
 library:
   source-dirs: haskellbook
