@@ -25,6 +25,8 @@ dependencies:
   - QuickCheck
   - hspec
   - checkers
+  - text
+  - uuid
 
 library:
   source-dirs: haskellbook
