@@ -27,6 +27,9 @@ dependencies:
   - checkers
   - text
   - uuid
+  - random
+  - transformers
+  - dlist
 
 library:
   source-dirs: haskellbook
