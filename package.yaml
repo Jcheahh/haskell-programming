@@ -30,6 +30,7 @@ dependencies:
   - random
   - transformers
   - dlist
+  - trifecta
 
 library:
   source-dirs: haskellbook
