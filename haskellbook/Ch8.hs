@@ -95,3 +95,6 @@ digits' n = go n []
 
 wordNumber :: Int -> String
 wordNumber n = concat $ intersperse "-" (map digitToWord (digits n))
+
+-----------------------------------------------------------------
+-- Revision

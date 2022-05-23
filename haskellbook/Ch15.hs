@@ -424,3 +424,6 @@ main = do
   print $ (rmzero :: (String, Int))
   print $ rmleft == runMem f' 0
   print $ rmright == runMem f' 0
+
+-----------------------------------------------------------------
+-- Revision

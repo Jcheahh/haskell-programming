@@ -235,3 +235,6 @@ main = do
   print $ bolt 7
   print $ fmap bolt z
   print $ sequenceA [(> 3), (< 8), even] 7
+
+-----------------------------------------------------------------
+-- Revision

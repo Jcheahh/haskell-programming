@@ -111,3 +111,6 @@ filterF ::
 filterF f = foldMap go
   where
     go x = if f x then pure x else mempty
+
+-----------------------------------------------------------------
+-- Revision

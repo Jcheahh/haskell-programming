@@ -208,3 +208,6 @@ meh (x : xs) f = do
 
 flipType :: (Monad m) => [m a] -> m [a]
 flipType = flip meh id
+
+-----------------------------------------------------------------
+-- Revision

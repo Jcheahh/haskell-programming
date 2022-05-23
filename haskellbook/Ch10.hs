@@ -200,3 +200,6 @@ myMinimumBy f (x : xs) = go f xs x
       | f x max == GT = go f xs max
       | f x max == LT = go f xs x
       | otherwise = go f xs max
+
+-----------------------------------------------------------------
+-- Revision

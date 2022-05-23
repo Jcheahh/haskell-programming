@@ -292,3 +292,6 @@ runAC = do
   -- quickCheck (squareIdentity :: Double -> Bool) -- doesn't hold negative value
   quickCheck prop_idempotenceCapitalize
   quickCheck prop_idempotenceSort
+
+-----------------------------------------------------------------
+-- Revision
