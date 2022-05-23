@@ -132,3 +132,88 @@ main = do
 
 -----------------------------------------------------------------
 -- Revision
+
+-- 1.
+-- >>> avgGrade' 90
+-- 'A'
+-- >>> avgGrade' 75
+-- 'C'
+-- >>> avgGrade' 60
+-- 'D'
+
+avgGrade' :: (Fractional a, Ord a) => a -> Char
+avgGrade' x
+  | y >= 0.9 = 'A'
+  | y >= 0.8 = 'B'
+  | y >= 0.7 = 'C'
+  | y >= 0.59 = 'D'
+  | otherwise = 'F'
+  where
+    y = x / 100
+
+-- 2.
+-- No, will return 'C'
+
+-- 3.
+-- B
+
+-- 4.
+-- String, [a]
+
+-- 5.
+-- pal :: String -> Bool
+-- pal :: [a] -> Bool
+
+-- 6.
+-- C
+
+-- 7.
+-- Int
+
+-- 8.
+-- numbers :: Int -> Int
+
+-- Chapter 7.11
+
+-- 1. D
+
+-- 2. B
+
+-- 3. A, D
+
+-- 4. B
+
+-- 5. A
+
+-- >>> tensDigit' 124
+-- 2
+
+tensDigit' :: Integral a => a -> a
+tensDigit' x = mt
+  where
+    (d, m) = divMod x 10
+    mt = d `mod` 10
+
+-- >>> hunsD' 1234
+-- 2
+
+hunsD' :: Integral a => a -> a
+hunsD' x
+  | x < 100 = 0
+  | otherwise = mt
+  where
+    (d, m) = divMod x 100
+    mt = d `mod` 10
+
+foldBoolCase :: a -> a -> Bool -> a
+foldBoolCase x y bool = case bool of
+  False -> x
+  True -> y
+
+foldBoolGuard :: a -> a -> Bool -> a
+foldBoolGuard x y bool
+  | bool = y
+  | otherwise = x
+
+g' :: (a -> b) -> (a, c) -> (b, c)
+g' f (a, c) = (f a, c)
