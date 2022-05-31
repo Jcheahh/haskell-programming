@@ -203,3 +203,175 @@ myMinimumBy f (x : xs) = go f xs x
 
 -----------------------------------------------------------------
 -- Revision
+
+-- Exercises: Understanding folds
+
+-- 1. b,c
+-- 2. (3 * (2 * (1 * 1)))
+-- 3. a
+-- 4. d
+-- 5.  a) foldr (++) [] ["woot", "WOOT", "woot"]
+--     b) foldr max ' ' "fear is the little death"
+--     c) foldr (&&) True [False, True]
+--     d) foldr (||) False [False, False]
+--     e) foldl (flip ((++) . show)) "" [1..5]
+--     f) foldr const 0 [1..5]
+--     g) foldr const ' ' "tacos"
+--     h) foldl (flip const) ' ' "burritos"
+--     i) foldl (flip const) 0 [1..5]
+
+-- >>> filterDbDate' theDatabase
+-- [1911-05-01 09:28:43 UTC,1921-05-01 09:28:43 UTC]
+
+filterDbDateR ::
+  [DatabaseItem] ->
+  [UTCTime]
+filterDbDateR [] = []
+filterDbDateR (x : xs) = case x of
+  DbDate ut -> ut : filterDbDateR xs
+  _ -> filterDbDateR xs
+
+-- >>> filterDbNumberR theDatabase
+-- [9001,25]
+
+filterDbNumberR ::
+  [DatabaseItem] ->
+  [Integer]
+filterDbNumberR [] = []
+filterDbNumberR (x : xs) = case x of
+  DbNumber int -> int : filterDbNumberR xs
+  _ -> filterDbNumberR xs
+
+-- >>> mostRecentR theDatabase
+-- 1921-05-01 09:28:43 UTC
+
+mostRecentR ::
+  [DatabaseItem] ->
+  UTCTime
+mostRecentR = maximum . filterDbDate
+
+-- >>> sumDbR theDatabase
+-- 9026
+
+sumDbR ::
+  [DatabaseItem] ->
+  Integer
+sumDbR = sum . filterDbNumberR
+
+-- >>> avgDbR theDatabase
+-- 4513.0
+
+avgDbR ::
+  [DatabaseItem] ->
+  Double
+avgDbR xs = fromIntegral (sumDbR xs) / fromIntegral leng
+  where
+    leng = length $ filterDbNumberR xs
+
+-- Scans exercises
+
+fibsR = take 20 $ 1 : scanl (+) 1 fibsR
+
+fibsR' = takeWhile (< 100) $ 1 : scanl (+) 1 fibsR'
+
+fibsN x = fibsR !! x
+
+fac x = take (x + 1) $ scanl (*) 1 [1 ..]
+
+stopVowelStopR :: String -> String -> [(Char, Char, Char)]
+stopVowelStopR xs ys = go xs
+  where
+    vowelStop :: String -> String -> [(Char, Char)]
+    vowelStop [] _ = []
+    vowelStop (x : xs) ys = fmap (\y -> (x, y)) ys ++ vowelStop xs ys
+    vs = vowelStop ys xs
+    go :: String -> [(Char, Char, Char)]
+    go [] = []
+    go (x : xs') = fmap (\(y, z) -> (x, y, z)) vs ++ go xs'
+
+stopVowelStopP :: String -> String -> [(Char, Char, Char)]
+stopVowelStopP xs ys = go xs
+  where
+    vowelStop :: String -> String -> [(Char, Char)]
+    vowelStop [] _ = []
+    vowelStop (x : xs) ys = fmap (\y -> (x, y)) ys ++ vowelStop xs ys
+    vs = vowelStop ys xs
+    go :: String -> [(Char, Char, Char)]
+    go [] = []
+    go (x : xs') = if x == 'p' then fmap (\(y, z) -> (x, y, z)) vs ++ go xs' else go xs'
+
+seekritFunc :: String -> Int
+seekritFunc x =
+  div
+    (sum (map length (words x)))
+    (length (words x))
+
+myOrR :: [Bool] -> Bool
+myOrR = foldr (||) False
+
+myAnyR :: (a -> Bool) -> [a] -> Bool
+myAnyR f = foldr (\x a -> f x || a) False
+
+-- >>> myElemR 1 [2..10]
+-- False
+
+myElemR :: Eq a => a -> [a] -> Bool
+myElemR x = foldr (\y a -> x == y) False
+
+-- >>> myElemR1 1 [1..10]
+-- True
+
+myElemR1 :: Eq a => a -> [a] -> Bool
+myElemR1 x = any (x ==)
+
+-- >>> myReverseR "blah"
+-- "halb"
+
+myReverseR :: [a] -> [a]
+myReverseR = foldl (flip (:)) []
+
+-- >>> myMapR (+1) [1,2,3,4,5]
+-- [2,3,4,5,6]
+
+myMapR :: (a -> b) -> [a] -> [b]
+myMapR f = foldr (\x a -> f x : a) []
+
+-- >>> myFilterR (> 1) [1,2,3,4,5]
+-- [2,3,4,5]
+
+myFilterR :: (a -> Bool) -> [a] -> [a]
+myFilterR f = foldr (\x a -> if f x then x : a else a) []
+
+-- >>> squishR [[1],[2],[3],[4],[5]]
+-- [1,2,3,4,5]
+
+squishR :: [[a]] -> [a]
+squishR = foldr (++) []
+
+-- >>> squishMapR (\x -> [1, x, 3]) [2]
+-- [1,2,3]
+
+squishMapR :: (a -> [b]) -> [a] -> [b]
+squishMapR f = squishR . myMapR f
+
+squishAgainR :: [[a]] -> [a]
+squishAgainR = squishMapR id
+
+-- >>> myMaximumBy (\_ _ -> GT) [1..10]
+-- 10
+
+myMaximumByR ::
+  Num a =>
+  (a -> a -> Ordering) ->
+  [a] ->
+  a
+myMaximumByR f = foldr (\x a -> if f x a == GT then x else a) 0
+
+-- >>> myMinimumBy compare [1..10]
+-- 1
+myMinimumByR ::
+  Num a =>
+  (a -> a -> Ordering) ->
+  [a] ->
+  a
+myMinimumByR f = foldr (\x a -> if f x a == GT then a else x) 0
