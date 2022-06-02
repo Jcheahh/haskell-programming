@@ -420,3 +420,398 @@ printExpr (Add a b) = printExpr a ++ " + " ++ printExpr b
 
 -----------------------------------------------------------------
 -- Revision
+
+-- Exercises: Dog types
+
+-- 1. type constructor
+-- 2. * -> *
+-- 3. *
+-- 4. Doggies Int
+-- 5. Doggies Integer
+-- 6. Doggies String
+-- 7. type constructor
+-- 8. a -> DogueDeBordeaux a
+-- 9. DogueDeBordeaux String
+
+data PriceR
+  = PriceR Integer
+  deriving (Eq, Show)
+
+data SizeR
+  = Small
+  | Medium
+  | Big
+  deriving (Eq, Show)
+
+data ManufacturerR
+  = MiniR
+  | MazdaR
+  | TataR
+  deriving (Eq, Show)
+
+data AirlineR
+  = PapuAirR
+  | CatapultsR'UsR
+  | TakeYourChancesUnitedR
+  deriving (Eq, Show)
+
+data VehicleR
+  = CarR ManufacturerR PriceR
+  | PlaneR AirlineR SizeR
+  deriving (Eq, Show)
+
+myCarR = CarR MiniR (PriceR 14000)
+
+urCarR = CarR MazdaR (PriceR 20000)
+
+clownCarR = CarR TataR (PriceR 7000)
+
+dogeR = PlaneR PapuAirR
+
+isCarR :: VehicleR -> Bool
+isCarR (CarR _ _) = True
+isCarR _ = False
+
+isPlaneR :: VehicleR -> Bool
+isPlaneR (PlaneR _ _) = True
+isPlaneR _ = False
+
+areCarRs :: [VehicleR] -> [Bool]
+areCarRs = map isCarR
+
+getManuR :: VehicleR -> ManufacturerR
+getManuR (CarR manu _) = manu
+getManuR _ = error "No manu"
+
+-- Exercises: Cardinality
+
+-- 1. 1
+-- 2. 3
+-- 3. 65536
+-- 4. infinity cardinality for Integer
+-- 5. 2 ^ 8
+
+-- Exercises: For example
+
+-- 1. Example
+-- 2. instance Show Example
+-- 3. Int -> Example
+
+class TooManyR a where
+  tooManyR :: a -> Bool
+
+instance TooManyR Int where
+  tooManyR n = n > 42
+
+instance TooManyR (Int, String) where
+  tooManyR (n, m) = tooManyR n
+
+instance TooManyR (Int, Int) where
+  tooManyR (n, m) = tooManyR (n + m)
+
+instance (Num a, TooManyR a) => TooManyR (a, a) where
+  tooManyR (n, m) = tooManyR (n + m)
+
+-- Exercises: Pity the Bool
+
+-- 1. 4
+-- 2. 258
+
+type GardenerR = String
+
+data GardenR
+  = GardeniaR GardenerR
+  | DaisyR GardenerR
+  | RoseR GardenerR
+  | LilacR GardenerR
+  deriving (Show)
+
+data OperatingSystemR
+  = GnuPlusLinuxR
+  | OpenBSDPlusNevermindJustBSDStillR
+  | MacR
+  | WindowsR
+  deriving (Eq, Show)
+
+data ProgLangR
+  = HaskellR
+  | AgdaR
+  | IdrisR
+  | PureScriptR
+  deriving (Eq, Show)
+
+data ProgrammerR = ProgrammerR
+  { osR :: OperatingSystemR,
+    langR :: ProgLangR
+  }
+  deriving (Eq, Show)
+
+allOperatingSystemsR :: [OperatingSystemR]
+allOperatingSystemsR =
+  [ GnuPlusLinuxR,
+    OpenBSDPlusNevermindJustBSDStillR,
+    MacR,
+    WindowsR
+  ]
+
+allLanguagesR :: [ProgLangR]
+allLanguagesR =
+  [HaskellR, AgdaR, IdrisR, PureScriptR]
+
+allProgrammersR :: [ProgrammerR]
+allProgrammersR = go allOperatingSystemsR allLanguagesR
+  where
+    go [] ys = []
+    go (x : xs) ys = fmap (\l -> ProgrammerR {osR = x, langR = l}) ys ++ go xs ys
+
+convert1' :: Quantum -> Bool
+convert1' Yes = True
+convert1' No = True
+convert1' Both = True
+
+convert2' :: Quantum -> Bool
+convert2' Yes = True
+convert2' No = True
+convert2' Both = False
+
+convert3' :: Quantum -> Bool
+convert3' Yes = True
+convert3' No = False
+convert3' Both = True
+
+convert4' :: Quantum -> Bool
+convert4' Yes = False
+convert4' No = True
+convert4' Both = True
+
+convert5' :: Quantum -> Bool
+convert5' Yes = False
+convert5' No = False
+convert5' Both = False
+
+convert6' :: Quantum -> Bool
+convert6' Yes = False
+convert6' No = False
+convert6' Both = True
+
+convert7' :: Quantum -> Bool
+convert7' Yes = False
+convert7' No = True
+convert7' Both = False
+
+convert8' :: Quantum -> Bool
+convert8' Yes = True
+convert8' No = False
+convert8' Both = False
+
+-- Exercises: The Quad
+
+-- 1. (4 + 4) 8
+-- 2. (4 * 4) 16
+-- 3. (4 ^ 4) 256
+-- 4. ((2 * 2) * 2) 8
+-- 5. ((2 ^ 2) ^ 2) 16
+-- 6. ((2 ^ 4) ^ 4) 65536
+
+mapTreeR ::
+  (a -> b) ->
+  BinaryTree a ->
+  BinaryTree b
+mapTreeR _ Leaf = Leaf
+mapTreeR f (Node left a right) =
+  Node (mapTreeR f left) (f a) (mapTreeR f right)
+
+testTreeR :: BinaryTree Integer
+testTreeR =
+  Node
+    (Node Leaf 3 Leaf)
+    1
+    (Node Leaf 4 Leaf)
+
+mapExpectedR =
+  Node
+    (Node Leaf 4 Leaf)
+    2
+    (Node Leaf 5 Leaf)
+
+mapOkayR =
+  if mapTree (+ 1) testTree' == mapExpected
+    then print "yup OK!"
+    else error "test failed!"
+
+preorderR :: BinaryTree a -> [a]
+preorderR Leaf = []
+preorderR (Node left x right) = [x] ++ preorderR left ++ preorderR right
+
+inorderR :: BinaryTree a -> [a]
+inorderR Leaf = []
+inorderR (Node left x right) = inorderR left ++ [x] ++ inorderR right
+
+postorderR :: BinaryTree a -> [a]
+postorderR Leaf = []
+postorderR (Node left x right) = postorderR left ++ postorderR right ++ [x]
+
+testTreeR' :: BinaryTree Integer
+testTreeR' =
+  Node
+    (Node Leaf 1 Leaf)
+    2
+    (Node Leaf 3 Leaf)
+
+testPreorderR :: IO ()
+testPreorderR =
+  if preorderR testTreeR' == [2, 1, 3]
+    then putStrLn "Preorder fine!"
+    else putStrLn "Bad news bears."
+
+testInorderR :: IO ()
+testInorderR =
+  if inorderR testTreeR' == [1, 2, 3]
+    then putStrLn "Inorder fine!"
+    else putStrLn "Bad news bears."
+
+testPostorderR :: IO ()
+testPostorderR =
+  if postorderR testTreeR' == [1, 3, 2]
+    then putStrLn "Postorder fine!"
+    else putStrLn "Bad news bears"
+
+mainR :: IO ()
+mainR = do
+  testPreorderR
+  testInorderR
+  testPostorderR
+
+-- 11.18
+
+-- 1. A
+-- 2. C
+-- 3. B
+-- 4. C
+
+isSubseqOfR ::
+  (Eq a) =>
+  [a] ->
+  [a] ->
+  Bool
+isSubseqOfR [] _ = True
+isSubseqOfR _ [] = False
+isSubseqOfR xs'@(x : xs) ys'@(y : ys)
+  | x == y = isSubseqOfR xs ys
+  | otherwise = isSubseqOfR xs' ys
+
+capitalizeWordsR ::
+  String ->
+  [(String, String)]
+capitalizeWordsR xs = map (\x -> (x, capitalizeWordR x)) (words xs)
+
+capitalizeWordR :: String -> String
+capitalizeWordR [] = []
+capitalizeWordR (x : xs) = toUpper x : xs
+
+isLast :: String -> Bool
+isLast xs = last xs == '.'
+
+capitalizeParagraphR :: String -> String
+capitalizeParagraphR xs = go (words xs) [] []
+  where
+    go [] _ acc = unwords acc
+    go (x : xs) reco acc
+      | isLast x && null reco = go xs [] (acc ++ [capitalizeWordR x])
+      | isLast x && not (null reco) = go xs [] (acc ++ [capitalizeWordR (head reco)] ++ tail reco ++ [x])
+      | null reco = go xs (reco ++ [capitalizeWordR x]) acc
+      | otherwise = go xs (reco ++ [x]) acc
+
+data DaPhoneR = DaPhoneR [(Digit, String)]
+
+allPossipleR :: DaPhoneR
+allPossipleR =
+  DaPhoneR
+    [ ('1', " "),
+      ('2', "abc"),
+      ('3', "def"),
+      ('4', "ghi"),
+      ('5', "jkl"),
+      ('6', "mno"),
+      ('7', "pqrs"),
+      ('8', "tuv"),
+      ('9', "wxyz"),
+      ('*', "*^"),
+      ('0', " +_"),
+      ('#', "#.,")
+    ]
+
+convoR :: [String]
+convoR =
+  [ "Wanna play 20 questions",
+    "Ya",
+    "U 1st haha",
+    "Lol OK. Have u ever tasted alcohol",
+    "Lol ya",
+    "Wow ur cool haha. Ur turn",
+    "OK. Do u think I am pretty Lol",
+    "Lol ya",
+    "Just making sure rofl ur turn"
+  ]
+
+type DigitR = Char
+
+type PressesR = Int
+
+reverseTapsR ::
+  DaPhoneR ->
+  Char ->
+  [(Digit, Presses)]
+reverseTapsR (DaPhoneR xs) x =
+  if isLower x
+    then go xs x
+    else upperX : go xs (toLower x)
+  where
+    upperX = ('*', 1)
+    go [] _ = error "Not found"
+    go ((key, value) : kvs) target =
+      if target `elem` value
+        then [(key, 1 + fromMaybe (error "Not found") (elemIndex target value))]
+        else go kvs target
+
+cellPhonesDeadR ::
+  DaPhoneR ->
+  String ->
+  [(Digit, Presses)]
+cellPhonesDeadR dp = concatMap $ reverseTapsR dp
+
+fingerTapsR :: [(Digit, Presses)] -> Presses
+fingerTapsR [] = 0
+fingerTapsR ((key, value) : kvs) = value + fingerTapsR kvs
+
+mostPopularR :: Ord a => [a] -> a
+mostPopularR xs = go xs Map.empty
+  where
+    go [] map =
+      fst $
+        Map.foldrWithKey
+          (\k v (k', v') -> if v > v' then (k, v) else (k', v'))
+          (error "", 0)
+          map
+    go (x : xs) map = go xs $ Map.insertWith (+) x 1 map
+
+mostPopularLetterR :: String -> Char
+mostPopularLetterR = mostPopularR
+
+coolestLtrR :: [String] -> Char
+coolestLtrR = mostPopularLetterR . concat
+
+coolestWordR :: [String] -> String
+coolestWordR = mostPopularR
+
+data ExprR
+  = LitR Integer
+  | AddR ExprR ExprR
+
+evalR :: ExprR -> Integer
+evalR (LitR int) = int
+evalR (AddR exp exp1) = evalR exp + evalR exp1
+
+printExprR :: ExprR -> String
+printExprR (LitR int) = show int
+printExprR (AddR exp exp1) = printExprR exp ++ " + " ++ printExprR exp1
