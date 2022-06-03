@@ -203,3 +203,167 @@ treeBuild n = unfold (\x -> if x >= n then Nothing else Just (x + 1, x, x + 1)) 
 
 -----------------------------------------------------------------
 -- Revision
+
+-- 12.5 Chapter exercises
+
+-- 1. *
+-- 2. * and * -> *
+
+notTheR :: String -> Maybe String
+notTheR "the" = Nothing
+notTheR x = Just x
+
+replaceTheR :: String -> String
+replaceTheR xs = unwords $ map (\x -> if isNothing (notTheR x) then "a" else x) $ words xs
+
+countTheBeforeVowelR :: String -> Integer
+countTheBeforeVowelR = go 0 . words
+  where
+    go :: Integer -> [String] -> Integer
+    go n [] = n
+    go n [a] = n
+    go n ("the" : (c : cs) : xs)
+      | c `elem` vowels = go (n + 1) xs
+    go n (x : xs) = go n xs
+
+countVowelsR :: String -> Integer
+countVowelsR [] = 0
+countVowelsR (x : xs) =
+  if x `elem` vowels
+    then 1 + countVowelsR xs
+    else countVowelsR xs
+
+mkWord' :: String -> Maybe Word'
+mkWord' xs = if length filterVowels > length filterNotVowels then Nothing else Just (Word' xs)
+  where
+    filterVowels = filter (`elem` vowels) xs
+    filterNotVowels = filter (`notElem` vowels) xs
+
+data NatR
+  = ZeroR
+  | SuccR NatR
+  deriving (Eq, Show)
+
+natToIntegerR :: NatR -> Integer
+natToIntegerR ZeroR = 0
+natToIntegerR (SuccR nat) = 1 + natToIntegerR nat
+
+integerToNatR' :: Integer -> Maybe NatR
+integerToNatR' n
+  | n < 0 = Nothing
+  | n == 0 = Just ZeroR
+  | otherwise = fmap SuccR $ integerToNatR' (n - 1)
+
+integerToNatR :: Integer -> Maybe NatR
+integerToNatR n = if n < 0 then Nothing else Just $ maybeNatR n
+
+maybeNatR :: Integer -> NatR
+maybeNatR n
+  | n > 0 = SuccR (maybeNatR (n - 1))
+  | otherwise = ZeroR
+
+isJustR :: Maybe a -> Bool
+isJustR Nothing = False
+isJustR (Just _) = True
+
+isNothingR :: Maybe a -> Bool
+isNothingR Nothing = True
+isNothingR (Just _) = False
+
+mayybeeR :: b -> (a -> b) -> Maybe a -> b
+mayybeeR b _ Nothing = b
+mayybeeR b f (Just a) = f a
+
+fromMaybeR :: a -> Maybe a -> a
+fromMaybeR x Nothing = x
+fromMaybeR _ (Just a) = a
+
+listToMaybeR :: [a] -> Maybe a
+listToMaybeR [] = Nothing
+listToMaybeR (x : xs) = Just x
+
+maybeToListR :: Maybe a -> [a]
+maybeToListR Nothing = []
+maybeToListR (Just x) = [x]
+
+catMaybesR :: [Maybe a] -> [a]
+catMaybesR [] = []
+catMaybesR (Nothing : xs) = catMaybesR xs
+catMaybesR ((Just x) : xs) = x : catMaybesR xs
+
+flipMaybeR :: [Maybe a] -> Maybe [a]
+flipMaybeR [] = Just []
+flipMaybeR (Nothing : xs) = Nothing
+flipMaybeR ((Just x) : xs) = fmap ([x] ++) $ flipMaybeR xs
+
+leftsR :: [Either a b] -> [a]
+leftsR [] = []
+leftsR ((Left x) : xs) = x : leftsR xs
+leftsR ((Right y) : xs) = leftsR xs
+
+rightR :: [Either a b] -> [b]
+rightR [] = []
+rightR ((Left x) : xs) = rightR xs
+rightR ((Right y) : xs) = y : rightR xs
+
+partitionEithersR ::
+  [Either a b] ->
+  ([a], [b])
+partitionEithersR xs = go xs ([], [])
+  where
+    go [] acc = acc
+    go ((Left x) : xs) (acc, abb) = go xs (x : acc, abb)
+    go ((Right y) : xs) (acc, abb) = go xs (acc, y : abb)
+
+eitherMaybeR ::
+  (b -> c) ->
+  Either a b ->
+  Maybe c
+eitherMaybeR _ (Left _) = Nothing
+eitherMaybeR f (Right x) = Just $ f x
+
+eitherR ::
+  (a -> c) ->
+  (b -> c) ->
+  Either a b ->
+  c
+eitherR f g (Left x) = f x
+eitherR f g (Right x) = g x
+
+eitherMaybeR' ::
+  (b -> c) ->
+  Either a b ->
+  Maybe c
+eitherMaybeR' f (Left x) = Nothing
+eitherMaybeR' f (Right x) = Just $ eitherR id f (Right x)
+
+myIterateR :: (a -> a) -> a -> [a]
+myIterateR f x = x : myIterateR f (f x)
+
+myUnfoldrR ::
+  (b -> Maybe (a, b)) ->
+  b ->
+  [a]
+myUnfoldrR f x = a : myUnfoldr f b
+  where
+    Just (a, b) = f x
+
+betterIterateR :: (a -> a) -> a -> [a]
+betterIterateR f x = myUnfoldrR f1 x
+  where
+    f1 x = Just (x, f x)
+
+unfoldTree ::
+  (a -> Maybe (a, b, a)) ->
+  a ->
+  BinaryTree b
+unfoldTree f x = case f x of
+  Nothing -> Leaf
+  Just (a, b, a') -> Node (unfoldTree f a) b (unfoldTree f a')
+
+treeBuildR :: Integer -> BinaryTree Integer
+treeBuildR n = go 0
+  where
+    go count
+      | n == 0 || count == n = Leaf
+      | otherwise = Node (go (count + 1)) count (go (count + 1))
