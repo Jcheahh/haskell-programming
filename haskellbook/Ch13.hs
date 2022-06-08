@@ -45,3 +45,23 @@ gimmePerson = forever $ do
 
 -----------------------------------------------------------------
 -- Revision
+
+--  1. forever, when
+--  2. Data.Bits, Database.Blacktip.Types
+--  3. functions
+--  4. (a) Control.Concurrent.MVar, Control.Concurrent,
+--         Filesystem.Path.CurrentOS, Filesystem, Data.ByteString.Char8
+--     (b) Filesystem
+--     (c) Prelude
+
+gimmePersonR :: IO ()
+gimmePersonR = forever $ do
+  putStrLn "Please type in your name: "
+  name <- getLine
+  putStrLn "Please type in your age: "
+  age <- getLine
+  case mkPerson name (read age) of
+    Left pi -> print pi
+    Right per -> do
+      putStrLn "Yay! Successfully got a person: "
+      print per
