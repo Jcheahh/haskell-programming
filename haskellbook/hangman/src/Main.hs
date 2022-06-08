@@ -34,7 +34,7 @@ newtype WordList
 
 allWords :: IO WordList
 allWords = do
-  dict <- readFile "data/dict.txt"
+  dict <- readFile "haskellbook/hangman/data/dict.txt"
   return $ WordList (lines dict)
 
 minWordLength :: Int
@@ -190,3 +190,130 @@ palindrome = forever $ do
         exitSuccess
   where
     isPalindrome xs = filter isAlpha (map toLower xs)
+
+------------------------------------------------------------------
+-- Revision
+
+data PuzzleR
+  = PuzzleR String [Maybe Char] [Char]
+
+instance Show PuzzleR where
+  show (PuzzleR _ discovered guessed) =
+    intersperse
+      ' '
+      ( fmap renderPuzzleCharR discovered
+      )
+      ++ " Guessed so far: "
+      ++ guessed
+
+freshPuzzleR :: String -> PuzzleR
+freshPuzzleR xs = PuzzleR xs (fmap (const Nothing) xs) []
+
+charInWordR :: PuzzleR -> Char -> Bool
+charInWordR (PuzzleR xs _ _) x = x `elem` xs
+
+alreadyGuessedR :: PuzzleR -> Char -> Bool
+alreadyGuessedR (PuzzleR _ _ zs) x = x `elem` zs
+
+renderPuzzleCharR :: Maybe Char -> Char
+renderPuzzleCharR Nothing = '_'
+renderPuzzleCharR (Just x) = x
+
+fillInCharacterR :: PuzzleR -> Char -> PuzzleR
+fillInCharacterR
+  ( PuzzleR
+      word
+      filledInSoFar
+      s
+    )
+  c =
+    PuzzleR word newFilledInSoFar (c : s)
+    where
+      zipper guessed wordChar guessChar =
+        if wordChar == guessed
+          then Just wordChar
+          else guessChar
+
+      newFilledInSoFar =
+        zipWith
+          (zipper c)
+          word
+          filledInSoFar
+
+handleGuessR :: PuzzleR -> Char -> IO PuzzleR
+handleGuessR puzzle guess = do
+  putStrLn $ "Your guess was: " ++ [guess]
+  case (charInWordR puzzle guess, alreadyGuessedR puzzle guess) of
+    (_, True) -> do
+      putStrLn
+        "You already guessed that\
+        \ character, pick \
+        \ something else!"
+      return puzzle
+    (True, _) -> do
+      putStrLn
+        "This character was in the\
+        \ word, filling in the word\
+        \ accordingly"
+      return (fillInCharacterR puzzle guess)
+    (False, _) -> do
+      putStrLn
+        "This character wasn't in\
+        \ the word, try again."
+      return (fillInCharacterR puzzle guess)
+
+gameOverR :: PuzzleR -> IO ()
+gameOverR (PuzzleR wordToGuess _ guessed) =
+  if (length guessed) > 20
+    then do
+      putStrLn "You lose!"
+      putStrLn $
+        "The word was: "
+          ++ wordToGuess
+      exitSuccess
+    else return ()
+
+gameWinR :: PuzzleR -> IO ()
+gameWinR (PuzzleR wordToGuess fillInSoFar _) =
+  if all isJust fillInSoFar
+    then do
+      putStrLn "You Win!"
+      putStrLn $
+        "The word is: "
+          ++ wordToGuess
+      exitSuccess
+    else return ()
+
+runGameR :: PuzzleR -> IO ()
+runGameR puzzle = forever $ do
+  gameOverR puzzle
+  gameWinR puzzle
+  putStrLn $ "Current puzzle is: " ++ show puzzle
+  putStr "Guess a letter: "
+  guess <- getLine
+  case guess of
+    [c] -> handleGuessR puzzle c >>= runGameR
+    _ ->
+      putStrLn
+        "Your guess must\
+        \ be a single character"
+
+mainR :: IO ()
+mainR = do
+  hSetBuffering stdout NoBuffering
+  word <- randomWord'
+  let puzzle = freshPuzzleR (fmap toLower word)
+  runGameR puzzle
+
+isChar :: Char -> Bool
+isChar x = x `elem` ['a' .. 'z']
+
+palindromeR :: IO ()
+palindromeR = forever $ do
+  line1 <- getLine
+  let filterL = filter isChar $ fmap toLower line1
+  case (filterL == reverse filterL) of
+    True -> putStrLn "It's a palindrome!"
+    False -> do
+      putStrLn "Nope!"
+      exitSuccess
