@@ -295,3 +295,220 @@ runAC = do
 
 -----------------------------------------------------------------
 -- Revision
+
+data IdentityR a
+  = IdentityR a
+  deriving (Eq, Show)
+
+identityGenR ::
+  Arbitrary a =>
+  Gen (IdentityR a)
+identityGenR = do
+  a <- arbitrary
+  return (IdentityR a)
+
+instance Arbitrary a => Arbitrary (IdentityR a) where
+  arbitrary = identityGenR
+
+identityGenIntR :: Gen (IdentityR Int)
+identityGenIntR = arbitrary
+
+data PairR a b
+  = PairR a b
+  deriving (Eq, Show)
+
+pairGenR ::
+  ( Arbitrary a,
+    Arbitrary b
+  ) =>
+  Gen (PairR a b)
+pairGenR = do
+  a <- arbitrary
+  b <- arbitrary
+  return (PairR a b)
+
+instance (Arbitrary a, Arbitrary b) => Arbitrary (PairR a b) where
+  arbitrary = pairGenR
+
+pairGenIntStringR :: Gen (PairR Int String)
+pairGenIntStringR = arbitrary
+
+data SumR a b
+  = FirstR a
+  | SecondR b
+  deriving (Eq, Show)
+
+sumGenEqualR :: (Arbitrary a, Arbitrary b) => Gen (SumR a b)
+sumGenEqualR = do
+  a <- arbitrary
+  b <- arbitrary
+  oneof
+    [ return $ FirstR a,
+      return $ SecondR b
+    ]
+
+sumGenCharIntR :: Gen (SumR Char Int)
+sumGenCharIntR = sumGenEqualR
+
+sumGenFirstPlsR ::
+  ( Arbitrary a,
+    Arbitrary b
+  ) =>
+  Gen (SumR a b)
+sumGenFirstPlsR = do
+  a <- arbitrary
+  b <- arbitrary
+  frequency
+    [ (10, return $ FirstR a),
+      (1, return $ SecondR b)
+    ]
+
+sumGenCharIntFirstR :: Gen (SumR Char Int)
+sumGenCharIntFirstR = sumGenFirstPlsR
+
+mainR :: IO ()
+mainR = hspec $ do
+  describe "digitToWord" $ do
+    it "returns zero for 0" $ do
+      digitToWord 0 `shouldBe` "zero"
+    it "returns one for 1" $ do
+      digitToWord 1 `shouldBe` "one"
+  describe "digits" $ do
+    it "returns [1] for 1" $ do
+      digits 1 `shouldBe` [1]
+    it "returns [1, 0, 0] for 100" $ do
+      digits 100 `shouldBe` [1, 0, 0]
+  describe "wordNumber" $ do
+    it "one-zero-zero given 100" $
+      do
+        wordNumber 100
+        `shouldBe` "one-zero-zero"
+    it "nine-zero-zero-one for 9001" $ do
+      wordNumber 9001
+        `shouldBe` "nine-zero-zero-one"
+  describe "halfIdentity" $ do
+    it "return x for halfIdentity x" $
+      do
+        property (\(x :: Double) -> x `shouldBe` halfIdentity x)
+  describe "listOrdered" $ do
+    it "for any list you apply (sort) to, this property should hold" $
+      do
+        property (\(x :: [Int]) -> listOrdered $ sort x)
+
+plusAssociativeR :: Int -> Int -> Int -> Bool
+plusAssociativeR x y z =
+  x + (y + z) == (x + y) + z
+
+plusCommutativeR :: Int -> Int -> Bool
+plusCommutativeR x y =
+  x + y == y + x
+
+-- 4.
+multiplyAssociativeR :: Int -> Int -> Int -> Bool
+multiplyAssociativeR x y z =
+  x * (y * z) == (x * y) * z
+
+multiplyCommutativeR :: Int -> Int -> Bool
+multiplyCommutativeR x y =
+  x * y == y * x
+
+-- 5.
+quotRemR :: Int -> Int -> Bool
+quotRemR x y =
+  y == 0 || (quot x y) * y + (rem x y) == x
+
+divModR :: Int -> Int -> Bool
+divModR x y =
+  y == 0 || (div x y) * y + (mod x y) == x
+
+-- 6.
+-- NOT ASSOCIATIVE!!!
+-- NOT COMMUTATIVE!!!
+-- powerAssociative :: Int -> Int -> Int -> Bool
+-- powerAssociative x y z =
+--   x ^ (y ^ z) == (x ^ y) ^ z
+
+-- powerCommutative :: Int -> Int -> Bool
+-- powerCommutative x y =
+--   x ^ y == y ^ x
+
+-- 7.
+prop_reverseR :: (Eq a) => [a] -> Bool
+prop_reverseR xs = (reverse . reverse) xs == id xs
+
+-- 8.
+prop_dollerSignR :: Fun Int String -> Int -> Bool
+prop_dollerSignR (Fn f) a = (f $ a) == f a
+
+prop_dotSignR :: Fun String Int -> Fun Int String -> Int -> Bool
+prop_dotSignR (Fn f) (Fn g) a = f (g a) == (f . g) a
+
+-- 9.
+prop_foldRConsR :: (Eq a) => [a] -> Bool
+prop_foldRConsR xs = foldr (:) [] xs == xs ++ []
+
+prop_foldRAppendR :: (Eq a) => [[a]] -> Bool
+prop_foldRAppendR xs = foldr (++) [] xs == concat xs
+
+-- 10.
+-- No. Because the xs possibly to be a empty list
+
+-- 11.
+prop_readShowR :: (Read a, Show a, Eq a) => a -> Bool
+prop_readShowR x = read (show x) == x
+
+squareR x = x * x
+
+squareIdentityR = squareR . sqrt
+
+-- Failure
+-- Doesn't hold negative value
+
+prop_idempotenceCapitalizeR :: String -> Bool
+prop_idempotenceCapitalizeR x =
+  ( capitalizeWord x
+      == twice capitalizeWord x
+  )
+    && ( capitalizeWord x
+           == fourTimes capitalizeWord x
+       )
+
+prop_idempotenceSortR :: Ord a => [a] -> Bool
+prop_idempotenceSortR x =
+  ( sort x
+      == twice sort x
+  )
+    && ( sort x
+           == fourTimes sort x
+       )
+
+runQcR :: IO ()
+runQcR = do
+  quickCheck plusAssociativeR
+  quickCheck plusCommutativeR
+  quickCheck multiplyAssociativeR
+  quickCheck multiplyCommutativeR
+  quickCheck quotRemR
+  quickCheck divModR
+  quickCheck (prop_reverseR :: [Int] -> Bool)
+  quickCheck prop_dollerSignR
+  quickCheck prop_dotSignR
+  quickCheck (prop_foldRConsR :: [Int] -> Bool)
+  quickCheck (prop_foldRAppendR :: [[Int]] -> Bool)
+  quickCheck (prop_readShowR :: Int -> Bool)
+  quickCheck prop_idempotenceCapitalizeR
+  quickCheck (prop_idempotenceSortR :: [Int] -> Bool)
+
+data FoolR
+  = FulseR
+  | FrueR
+  deriving (Eq, Show)
+
+genFoolR :: Gen FoolR
+genFoolR = oneof [return FulseR, return FrueR]
+
+genFoolR' :: Gen FoolR
+genFoolR' = elements [FulseR, FrueR]
+
+genFoolR1 :: Gen FoolR
+genFoolR1 = frequency [(2, return FulseR), (1, return FrueR)]
