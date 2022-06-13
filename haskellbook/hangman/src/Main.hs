@@ -11,6 +11,7 @@ import System.IO
     stdout,
   )
 import System.Random (randomRIO)
+import Test.Hspec
 
 main :: IO ()
 main = do
@@ -196,6 +197,7 @@ palindrome = forever $ do
 
 data PuzzleR
   = PuzzleR String [Maybe Char] [Char]
+  deriving (Eq)
 
 instance Show PuzzleR where
   show (PuzzleR _ discovered guessed) =
@@ -317,3 +319,19 @@ palindromeR = forever $ do
     False -> do
       putStrLn "Nope!"
       exitSuccess
+
+puzzle1 :: PuzzleR
+puzzle1 = PuzzleR "hello" [Nothing, Just 'e', Nothing, Nothing, Nothing] ['a', 'e', 's']
+
+puzzle2 :: PuzzleR
+puzzle2 = PuzzleR "hello" [Just 'h', Just 'e', Nothing, Nothing, Nothing] ['h', 'a', 'e', 's']
+
+runHangman :: IO ()
+runHangman = hspec $ do
+  describe "fillInCharacter" $ do
+    it "fillInCharacterR puzzle1 'h' `shouldBe` puzzle2" $ do
+      fillInCharacterR puzzle1 'h' `shouldBe` puzzle2
+  describe "handleGuess" $ do
+    it "handleGuessR puzzle1 'e' shouldBe` puzzle1" $ do
+      pz <- handleGuessR puzzle1 'e'
+      pz `shouldBe` puzzle1
